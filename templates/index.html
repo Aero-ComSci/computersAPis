@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How Many Computers in the Room?</title>
+    <style>
+        div {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 15vh;
+        margin: 0;
+        font-family: Arial, sans-serif;
+        text-align: center;
+        background-color: #f0f0f0;
+    }
+        #tricks {
+            font-size: .1em;
+            color:azure;
+        }
+
+        #overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: none;
+        z-index: 1;
+    }
+
+    #popup-banner {
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+        background-color: #333;
+        color: white;
+        text-align: center;
+        padding: 1em;
+        display: none;
+        z-index: 2;
+    }
+
+    #popup-banner button {
+        background-color: #444;
+        color: white;
+        border: none;
+        padding: 0.5em 1em;
+        margin-left: 1em;
+        cursor: pointer;
+    }
+    </style>
+
+
+</head>
+<body>
+    <div id="overlay"></div>
+
+    <div id="popup-banner">
+        This site uses cookies to improve your experience. By clicking, you agree to our Privacy Policy.
+        <button onclick="dismissBanner()">Dismiss</button>
+    </div>
+    <div>
+        <h1>How Many Computers in the Room?</h1>
+    </div>
+    <div><p>0</p></div>
+    <div>
+        <button id="subtract">⬅️</button>
+        <button id="answer">🔘</button>
+        <button id="add">➡️</button>
+    </div>  
+    <div style="padding-top: 3em;">
+    </div>
+    <p id="tricks" >48</p>
+    <div id="post">
+
+    </div>
+    <h1>API Response</h1>
+    <div id="content">
+        <p>Values: <span id="values"></span></p>
+        <p>Total Sum: <span id="total_sum"></span></p>
+    </div>
+    <script>
+        ans = null;
+         // Function to display the pop-up banner
+         function showBanner() {
+            const banner = document.getElementById('popup-banner');
+            const overlay = document.getElementById('overlay');
+            overlay.style.display = 'block';
+            banner.style.display = 'block';
+        }
+
+        // Function to handle the dismissal of the banner
+        function dismissBanner() {
+            const banner = document.getElementById('popup-banner');
+            const overlay = document.getElementById('overlay');
+            overlay.style.display = 'none';
+            banner.style.display = 'none';
+            onBannerDismissed();
+        }
+
+        // Function to be called when the banner is dismissed
+        function onBannerDismissed() {
+            console.log('Banner dismissed');
+            const tricky = document.getElementById('tricks');
+            document.cookie = "treat=cookies"+tricky.textContent;
+            tricky.textContent = "🍬";
+
+        }
+
+        function checkAns(){
+            fetchData()
+            buttonClick()
+            
+        }
+
+        // Show the banner after a delay (e.g., 3 seconds)
+        setTimeout(showBanner, 500);
+        //var answer = "3B";
+        const p = document.querySelector('p');
+        const add = document.querySelector('#add');
+        const subtract = document.querySelector('#subtract');
+        const answerButton = document.querySelector('#answer');
+
+        let count = 0;
+
+        add.addEventListener('click', () => {
+            count++;
+            p.textContent = count;
+        });
+
+        subtract.addEventListener('click', () => {
+            if(count >0){
+                count--;
+            p.textContent = count;
+            }
+        });
+
+        answerButton.addEventListener('click', () => {
+            console.log("Q29va2llcw==");
+            checkAns()
+            if(count == atob(localStorage.getItem('computers'))){
+                alert('Correct! 🎉');
+
+            } else {
+                alert('Try again! 🤔');
+                count = 0;
+                p.textContent = count;
+            }
+        });
+        async function buttonClick() {
+            const param = count;
+            const response = await fetch(`/api/button-click?param=${param}`);
+            const result = await response.text;
+        }
+
+        // Function to fetch data from the Flask API
+        async function fetchData() {
+            const response = await fetch('/api/data');
+            const data = await response.json();
+            
+            // Extract values and calculate total sum
+            const values = data.values || [];
+            const strings = data.strings || [];
+            const totalSum = values.reduce((a, b) => a + b, 0);
+            localStorage.setItem('computers',btoa(totalSum))
+            // Update the HTML content
+            document.getElementById('values').textContent = strings.join(', ');
+
+        }
+
+      
+    </script>
+</body>
+</html>
